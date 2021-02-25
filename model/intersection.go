@@ -3,6 +3,15 @@ package model
 type Intersection struct {
 	In  []*Street
 	Out []*Street
+
+	// In + Time
+	Schedule  []*ScheduleEntry
+	CycleTime int
+}
+
+type ScheduleEntry struct {
+	Street   *Street
+	Duration int
 }
 
 func (i *Intersection) String() string {
