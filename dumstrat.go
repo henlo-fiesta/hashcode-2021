@@ -9,28 +9,25 @@ func dumStrat(sim *model.Simulation) {
 		}
 	}
 	for _, inter := range sim.Intersections {
-		sum := 0
+		max := inter.In[0]
 		for _, str := range inter.In {
-			sum += str.PathCount
+			if str.PathCount > max.PathCount {
+				max = str
+			}
 		}
-		if sum == 0 || len(inter.In) == 0 {
-			continue
-		}
-		avg := float64(sum) / float64(len(inter.In))
 		for _, str := range inter.In {
 			if str.PathCount == 0 {
 				continue
 			}
 			entry := model.ScheduleEntry{
 				Street:   str,
-				Duration: 1,
+				Duration: 0,
 			}
-			if float64(str.PathCount) < avg {
-				entry.Duration = 0
+			if str.PathCount == max.PathCount {
+				entry.Duration = 1
 			}
 			inter.Schedule = append(inter.Schedule, &entry)
 			inter.CycleTime += entry.Duration
 		}
-		// inter.CycleTime = len(inter.In)
 	}
 }
