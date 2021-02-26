@@ -13,7 +13,8 @@ func (a DogStreets) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a DogStreets) Less(i, j int) bool { return a[i].Street.Congestion > a[j].Street.Congestion }
 
 func dogStrats(sim *model.Simulation, iter int) {
-	for _, inter := range sim.Intersections {
+	for i := range sim.Intersections {
+		inter := &sim.Intersections[i]
 		if len(inter.Schedule) == 0 {
 			continue
 		}
@@ -38,15 +39,15 @@ func dogStrats(sim *model.Simulation, iter int) {
 				inter.CycleTime++
 			}
 		}*/
-		for i:=0;i<len(congRank);i++ {
+		for i := 0; i < len(congRank); i++ {
 			if float64(congRank[last].Street.Congestion)/float64(congRank[i].Street.Congestion) < 0.7 &&
-				congRank[i].Duration<8{
+				congRank[i].Duration < 8 {
 				congRank[i].Duration++
 				inter.CycleTime++
 				continue
 			}
 		}
-		if iter>5 && congRank[last].Duration > 1 {
+		if iter > 5 && congRank[last].Duration > 1 {
 			congRank[last].Duration--
 			inter.CycleTime--
 		}

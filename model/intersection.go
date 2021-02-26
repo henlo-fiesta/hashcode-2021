@@ -8,8 +8,31 @@ type Intersection struct {
 	Schedule  []*ScheduleEntry
 	CycleTime int
 
-	fullSched []*ScheduleEntry
-	best      []*ScheduleEntry
+	best       []*ScheduleEntry
+	rulesIndex []*Street
+
+	Bandwidth int
+}
+
+func (inter *Intersection) CompileRules() {
+	inter.rulesIndex = make([]*Street, inter.CycleTime)
+	dt := 0
+	for _, rule := range inter.Schedule {
+		for i := 0; i < rule.Duration; i++ {
+			inter.rulesIndex[dt+i] = rule.Street
+		}
+		dt += rule.Duration
+	}
+}
+
+func (inter *Intersection) ApplyRules(t int) {
+	if inter.CycleTime < 1 {
+		return
+	}
+	goStreet := inter.rulesIndex[t%inter.CycleTime]
+	for _, str := range inter.In {
+		str.Go = str == goStreet
+	}
 }
 
 type ScheduleEntry struct {
@@ -35,4 +58,14 @@ func (i *Intersection) String() string {
 		str += s.Name + ","
 	}
 	return str + "}"
+}
+
+func (inter *Intersection) ConciseSchedule() []*ScheduleEntry {
+	concise := make([]*ScheduleEntry, 0)
+	for _, entry := range inter.Schedule {
+		if entry.Duration > 0 {
+			concise = append(concise, entry)
+		}
+	}
+	return concise
 }

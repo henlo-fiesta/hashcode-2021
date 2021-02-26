@@ -20,16 +20,14 @@ func TestCases(t *testing.T) {
 		defer pprof.StopCPUProfile()
 	}
 
-	simulation := model.NewSimulation("a.txt")
-	optimize(simulation)
-	simulation = model.NewSimulation("b.txt")
-	optimize(simulation)
-	simulation = model.NewSimulation("c.txt")
-	optimize(simulation)
-	simulation = model.NewSimulation("d.txt")
-	optimize(simulation)
-	simulation = model.NewSimulation("e.txt")
-	optimize(simulation)
-	simulation = model.NewSimulation("f.txt")
-	optimize(simulation)
+	cases := []string{"a", "b", "c", /*"d",*/ "e", "f"}
+	for _, filename := range cases {
+		simulation, err := model.LoadSimulation(filename)
+		if err != nil {
+			log.Fatal(err)
+		}
+		simulation.StartWorkers(0)
+		optimize(simulation)
+		simulation.StopWorkers()
+	}
 }

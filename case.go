@@ -13,7 +13,7 @@ func optimize(simulation *model.Simulation) {
 	simulation.SaveBest()
 
 	fmt.Printf("score=%d\n", simulation.Score)
-	/*for _, str := range simulation.Streets {
+	/*for _, str := range simulation.StreetsIndex {
 		fmt.Printf("%20s cong=%04d\n", str.Name, str.Congestion)
 	}*/
 	consecStagnate := 0
