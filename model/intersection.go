@@ -1,6 +1,8 @@
 package model
 
 type Intersection struct {
+	Id int
+
 	In  []*Street
 	Out []*Street
 
@@ -12,7 +14,16 @@ type Intersection struct {
 	rulesIndex []*Street
 
 	Bandwidth int
+	ActiveIn  int
+	Mean      float64
+	Variance  float64
+	StdDev    float64
 }
+
+type Intersections []*Intersection
+
+func (is Intersections) Len() int      { return len(is) }
+func (is Intersections) Swap(i, j int) { is[i], is[j] = is[j], is[i] }
 
 func (inter *Intersection) CompileRules() {
 	inter.rulesIndex = make([]*Street, inter.CycleTime)

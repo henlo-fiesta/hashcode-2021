@@ -20,7 +20,7 @@ func TestCases(t *testing.T) {
 		defer pprof.StopCPUProfile()
 	}
 
-	cases := []string{"a", "b", "c", /*"d",*/ "e", "f"}
+	cases := []string{"a", "b", "c", "d", "e", "f"}
 	for _, filename := range cases {
 		simulation, err := model.LoadSimulation(filename)
 		if err != nil {

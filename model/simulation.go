@@ -20,6 +20,22 @@ type Simulation struct {
 	jobResults          chan bool
 }
 
+func (simulation *Simulation) GetStreets() Streets {
+	// TODO cache?
+	s := make(Streets, len(simulation.Streets))
+	for i := range simulation.Streets {
+		s[i] = &simulation.Streets[i]
+	}
+	return s
+}
+func (simulation *Simulation) GetIntersections() Intersections {
+	is := make(Intersections, len(simulation.Intersections))
+	for i := range simulation.Intersections {
+		is[i] = &simulation.Intersections[i]
+	}
+	return is
+}
+
 func (simulation *Simulation) SaveBest() {
 	for i := range simulation.Intersections {
 		simulation.Intersections[i].SaveBest()

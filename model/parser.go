@@ -46,6 +46,9 @@ func LoadSimulation(filename string) (*Simulation, error) {
 		Streets:       make([]Street, numStreets),
 		Cars:          make([]Car, numCars),
 	}
+	for i := 0; i < numIntersections; i++ {
+		simulation.Intersections[i].Id = i
+	}
 
 	for i := 0; i < numStreets; i++ {
 		if scanner.Scan() {

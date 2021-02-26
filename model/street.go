@@ -16,6 +16,11 @@ type Street struct {
 	Congestion int
 }
 
+type Streets []*Street
+
+func (s Streets) Len() int      { return len(s) }
+func (s Streets) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+
 func (s *Street) String() string {
 	return fmt.Sprintf("%s(%d)", s.Name, s.Length)
 }

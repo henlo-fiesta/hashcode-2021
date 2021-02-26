@@ -9,6 +9,7 @@ import (
 func optimize(simulation *model.Simulation) {
 	cloneSim := simulation.Clone()
 	strategy.DumStrat(simulation)
+	return
 	prevScore := simulation.Run()
 	best := prevScore
 	simulation.SaveBest()
