@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/henlo-fiesta/hashcode-2021/model"
+	"github.com/henlo-fiesta/hashcode-2021/strategy"
 )
 
 func optimize(simulation *model.Simulation) {
 	cloneSim := simulation.Clone()
-	dumStrat(simulation)
+	strategy.DumStrat(simulation)
 	prevScore := simulation.Run()
 	best := prevScore
 	simulation.SaveBest()
@@ -21,7 +22,7 @@ func optimize(simulation *model.Simulation) {
 		simulation := cloneSim
 		cloneSim = simulation.Clone()
 		simulation.Reset()
-		dogStrats(simulation, i)
+		strategy.DogStrats(simulation, i)
 		score := simulation.Run()
 		if score > best {
 			best = score

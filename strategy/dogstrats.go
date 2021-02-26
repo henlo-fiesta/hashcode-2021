@@ -1,4 +1,4 @@
-package main
+package strategy
 
 import (
 	"sort"
@@ -12,7 +12,7 @@ func (a DogStreets) Len() int           { return len(a) }
 func (a DogStreets) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a DogStreets) Less(i, j int) bool { return a[i].Street.Congestion > a[j].Street.Congestion }
 
-func dogStrats(sim *model.Simulation, iter int) {
+func DogStrats(sim *model.Simulation, iter int) {
 	for i := range sim.Intersections {
 		inter := &sim.Intersections[i]
 		if len(inter.Schedule) == 0 {

@@ -1,8 +1,8 @@
-package main
+package strategy
 
 import "github.com/henlo-fiesta/hashcode-2021/model"
 
-func dumStrat(sim *model.Simulation) {
+func DumStrat(sim *model.Simulation) {
 	for i := range sim.Cars {
 		path := sim.Cars[i].Path
 		for i, str := range path {
