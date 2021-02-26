@@ -18,6 +18,11 @@ type Intersection struct {
 	Mean      float64
 	Variance  float64
 	StdDev    float64
+	Z         float64
+
+	HopefulCycles     float64
+	ActualCycles      int
+	TargetCycleLength int
 }
 
 type Intersections []*Intersection

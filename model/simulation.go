@@ -132,7 +132,12 @@ func (simulation *Simulation) Step() {
 	// dequeue StreetsIndex
 	for i := range simulation.Streets {
 		str := &simulation.Streets[i]
-		str.Congestion += str.Queue.Len()
+		cong := str.Queue.Len()
+		if cong==0{
+			continue
+		}
+		str.Congestion += cong
+		str.CongestionAt[simulation.T%str.End.CycleTime] += cong
 		if str.Go {
 			front := str.Queue.Front()
 			if front == nil {
@@ -181,6 +186,9 @@ func (simulation *Simulation) Run() int {
 	for i := range simulation.Intersections {
 		inter := &simulation.Intersections[i]
 		inter.CompileRules()
+		for _, str := range inter.In {
+			str.CongestionAt = make([]int, inter.CycleTime)
+		}
 	}
 	for simulation.T <= simulation.Duration {
 		simulation.Step()

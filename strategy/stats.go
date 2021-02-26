@@ -22,21 +22,73 @@ type IntersectionsByBandwidth struct {
 func (is IntersectionsByBandwidth) Less(i, j int) bool {
 	return is.Intersections[i].Bandwidth < is.Intersections[j].Bandwidth
 }
+func CalcStats(sim *model.Simulation) {
+	for i := range sim.Cars {
+		path := sim.Cars[i].Path
+		for i, str := range path {
+			if i < len(path)-1 {
+				// meaning car crosses thru the intersection
+				str.Bandwidth++
+				str.End.Bandwidth++
+			}
+		}
+	}
+	for i := range sim.Intersections {
+		inter := &sim.Intersections[i]
+		for _, str := range inter.In {
+			if str.Bandwidth > 0 {
+				inter.ActiveIn++
+			}
+		}
+		if inter.ActiveIn > 0 {
+			inter.Mean = float64(inter.Bandwidth) / float64(inter.ActiveIn)
+			for _, s := range inter.In {
+				if s.Bandwidth > 0 {
+					inter.Variance += math.Pow(float64(s.Bandwidth)-inter.Mean, 2)
+				}
+			}
+			inter.StdDev = math.Sqrt(inter.Variance)
+			inter.Z = inter.StdDev / inter.Mean
+		}
+	}
+	for i := range sim.Intersections {
+		inter := &sim.Intersections[i]
+		if inter.Bandwidth == 0 {
+			continue
+		}
+		inter.HopefulCycles = float64(sim.Duration) / float64(inter.Bandwidth)
+		inter.ActualCycles = int(inter.HopefulCycles)
+		if inter.ActualCycles < 1 {
+			fmt.Printf("...warning... cycle overflow, fixing to 1\n")
+			inter.ActualCycles = 1
+		}
+		/*shrink := 1.01
+		if inter.ActualCycles > 7 {
+			inter.ActualCycles = int(math.Floor(inter.HopefulCycles / shrink))
+			if inter.ActualCycles < 7 {
+				inter.ActualCycles = 7
+			}
+		}
+		if inter.ActualCycles > 13 {
+			divisor := inter.Z/4
+			if divisor < shrink{
+				divisor = shrink
+			}
+			inter.ActualCycles = int(math.Floor(inter.HopefulCycles / divisor))
+			if inter.ActualCycles < 13 {
+				inter.ActualCycles = 13
+			}
+		}*/
+		inter.TargetCycleLength = sim.Duration / inter.ActualCycles
+	}
+}
 
-func printStats(sim *model.Simulation) {
-	fmt.Printf("Simulation - t:%d #s:%d #i:%d #c:%d\n",
+func PrintStats(sim *model.Simulation) {
+	fmt.Printf("Simulation - ruleset:%d #s:%d #i:%d #c:%d\n",
 		sim.Duration,
 		len(sim.Streets),
 		len(sim.Intersections),
 		len(sim.Cars))
-	/* streets are useless, refer to intersections instead
-	fmt.Printf("top 10 streets by bandwidth:\n")
-	ss := StreetsByBandwidth{sim.GetStreets()}
-	sort.Sort(ss)
-	for i := ss.Len() - 1; i >= 0 && i > ss.Len()-11; i-- {
-		s := ss.Streets[i]
-		fmt.Printf(" - %s(%d): b:%d\n", s.Name, s.Length, s.Bandwidth)
-	}*/
 	fmt.Printf("top 10 intersections by bandwidth:\n")
 	is := IntersectionsByBandwidth{sim.GetIntersections()}
 	sort.Sort(is)
@@ -45,39 +97,16 @@ func printStats(sim *model.Simulation) {
 		if inter.Bandwidth == 0 {
 			break
 		}
-		hopefulCycles := float64(sim.Duration) / float64(inter.Bandwidth)
-		actualCycles := int(math.Floor(hopefulCycles / 2))
-		if actualCycles < 1 {
-			fmt.Printf("...warning... cycle overflow, fixing to 1\n")
-			actualCycles = 1
-		}
-		Z := inter.StdDev / inter.Mean
-		if actualCycles > 2 {
-			actualCycles = int(math.Floor(hopefulCycles / 3))
-			if actualCycles < 2 {
-				actualCycles = 2
-			}
-		}
-		if actualCycles > 3 {
-			divisor := Z
-			if divisor < 4 {
-				divisor = 4
-			}
-			actualCycles = int(math.Floor(hopefulCycles / divisor))
-			if actualCycles < 3 {
-				actualCycles = 3
-			}
-		}
-		targetCycleLength := sim.Duration / actualCycles
+
 		fmt.Printf(" - %d: b:%d #hc:%.2f #ac:%d(l=%d) avg:%.2f stddev:%.2f(%.2fZ)\n",
 			inter.Id,
 			inter.Bandwidth,
-			hopefulCycles,
-			actualCycles,
-			targetCycleLength,
+			inter.HopefulCycles,
+			inter.ActualCycles,
+			inter.TargetCycleLength,
 			inter.Mean,
 			inter.StdDev,
-			Z)
+			inter.Z)
 	}
 
 	fmt.Printf("top 6 streets of top 3 intersections:\n")

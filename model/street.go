@@ -6,14 +6,16 @@ import (
 )
 
 type Street struct {
-	Name       string
-	Start      *Intersection
-	End        *Intersection
-	Length     int
-	Go         bool
-	Queue      *list.List
-	Bandwidth  int
-	Congestion int
+	Name         string
+	Start        *Intersection
+	End          *Intersection
+	Length       int
+	Go           bool
+	Queue        *list.List
+	Bandwidth    int
+	Congestion   int
+	CongestionAt []int
+	PeaksAt      float64
 }
 
 type Streets []*Street

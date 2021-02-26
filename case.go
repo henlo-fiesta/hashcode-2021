@@ -6,10 +6,12 @@ import (
 	"github.com/henlo-fiesta/hashcode-2021/strategy"
 )
 
-func optimize(simulation *model.Simulation) {
+func optimize(simulation *model.Simulation) int {
 	cloneSim := simulation.Clone()
-	strategy.DumStrat(simulation)
-	return
+	strategy.CalcStats(simulation)
+	//strategy.PrintStats(simulation)
+	strategy.QuadraticCostStrat(simulation)
+	//strategy.DumStrat(simulation)
 	prevScore := simulation.Run()
 	best := prevScore
 	simulation.SaveBest()
@@ -23,14 +25,16 @@ func optimize(simulation *model.Simulation) {
 		simulation := cloneSim
 		cloneSim = simulation.Clone()
 		simulation.Reset()
-		strategy.DogStrats(simulation, i)
+		//strategy.DogStrats(simulation, i)
+		//strategy.CongestedFirstStrat(simulation)
+		strategy.MatchPeakStrat(simulation)
 		score := simulation.Run()
 		if score > best {
 			best = score
 			simulation.SaveBest()
 		}
 		growth := float64(score)/float64(prevScore)*100 - 100
-		if growth <= 0.2 {
+		if growth <= 0.2 || score-prevScore < 1000 {
 			consecStagnate++
 		} else {
 			consecStagnate = 0
@@ -42,4 +46,5 @@ func optimize(simulation *model.Simulation) {
 		prevScore = score
 	}
 	fmt.Printf("best score=%d\n\n", best)
+	return best
 }
